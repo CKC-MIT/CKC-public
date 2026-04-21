@@ -1,5 +1,7 @@
 # CKC Public (AI Studio)
 
+CKC Website: https://ckc-mit.github.io/CKC-Public/
+
 CKC is a multi-agent coordination project from the MIT MAS.664 AI Studio track.
 
 This repository provides project documentation, website assets, and selected backend modules for reference and review.
