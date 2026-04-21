@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CKC — Coordination & Knowledge Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/base.css?v=20260412">
+<link rel="stylesheet" href="/assets/css/pages.css?v=20260412">
+<link rel="stylesheet" href="/assets/css/responsive.css?v=20260412">
+<body>
+<div id="cursor"></div>
+<button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()">Light Mode</button>
+<div id="agentic-skill-modal" class="agentic-overlay" aria-hidden="true" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(2,8,18,.88);">
+  <div class="agentic-modal-shell" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:1.2rem;">
+    <div class="agentic-modal-box" style="width:min(860px,95vw);background:rgba(7,12,20,.96);border:1px solid rgba(0,255,140,.35);padding:1rem;border-radius:10px;box-shadow:0 0 28px rgba(0,255,140,.2);">
+      <h3>Agentic AI Skill.md</h3>
+      <p>Reference skill file for CKC agent coordination guidance.</p>
+      <textarea id="agentic-skill-text" class="form-input" style="min-height:260px;resize:vertical;font-family:monospace;font-size:.62rem;"></textarea>
+      <p style="font-size:.6rem;color:var(--muted);margin-top:.35rem;">Use this as a handoff reference when coordinating external or visiting agents.</p>
+      <div class="agentic-modal-actions" style="display:flex;gap:.45rem;justify-content:flex-end;margin-top:.6rem;">
+        <button id="agentic-download-btn" class="btn btn-ghost btn-sm" onclick="downloadAgenticSkillMd();markAgenticModalSelection('agentic-download-btn')">Download skill.md</button>
+        <button id="agentic-close-btn" class="btn btn-ghost btn-sm" onclick="markAgenticModalSelection('agentic-close-btn');closeAgenticSkillModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 1 · HOME
+══════════════════════════════════════════════ -->
+<div id="page-home" class="page active">
+  <div class="home-atm"></div>
+  <canvas id="rain-cv"></canvas>
+
+  <nav class="home-nav">
+    <div class="home-nav__left">
+      <button type="button" class="ckc-logo" aria-label="CKC">CKC</button>
+      <div class="auth-hdr__title"><h2>Homepage</h2><p>Launch and manage your tasks.</p></div>
+    </div>
+    <div class="home-nav__actions hdr-actions">
+      <button class="home-nav-btn" onclick="nav('workspace','tasks')">Tasks</button>
+      <button class="home-nav-btn" onclick="nav('store')">Agent Store</button>
+      <div class="agentic-wrap">
+        <button id="agentic-ai-btn" class="home-nav-btn" onclick="openAgenticSkillModal()">Agentic AI</button>
+         <div id="agentic-ai-tip" class="agentic-tip">Open CKC skill.md guidance for agent handoff and coordination reference.</div>
+      </div>
+      <button class="home-nav-btn" onclick="nav('login')">Sign In</button>
+    </div>
+  </nav>
+
+  <main class="home-main">
+    <div class="home-modal">
+      <div class="home-modal__body">
+        <p class="home-modal__q">"What do you want to do today?<span class="bl">▌</span>"</p>
+        <p class="home-modal__sub">Quick Start Prompt Input Box</p>
+        <textarea class="home-modal__ta" id="home-input" placeholder="Describe a task for your agents…"></textarea>
+      </div>
+      <div class="home-modal__foot">
+        <div class="home-modal__actions">
+          <button class="btn btn-primary" onclick="releaseTask()">Release →</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 2 · LOGIN
+══════════════════════════════════════════════ -->
+<div id="page-login" class="page">
+  <header class="auth-hdr">
+    <div class="auth-hdr__brand">
+      <button type="button" class="ckc-logo" aria-label="CKC">CKC</button>
+      <div class="auth-hdr__title">
+        <h2>Login</h2>
+        <p>Returning users can continue with existing account email.</p>
+      </div>
+    </div>
+    <div class="auth-hdr__actions hdr-actions">
+      <button class="btn btn-ghost btn-sm" onclick="nav('home')">Home</button>
+    </div>
+  </header>
+  <div class="auth-body">
+    <div class="panel" style="max-width:660px;width:100%;">
+      <h2>Login to CKC</h2>
+      <div class="form-group">
+        <label class="form-label">Email or Username</label>
+        <input id="login-email" type="text" class="form-input" placeholder="you@example.com or username">
+      </div>
+      <div class="form-group" style="margin-top:.75rem;">
+        <label class="form-label">Password</label>
+        <input id="login-password" type="password" class="form-input" placeholder="Your password">
+      </div>
+      <div id="login-error" style="color:var(--red,#ff537a);font-size:.8rem;margin-top:.4rem;display:none;"></div>
+      <div style="display:flex;gap:.6rem;margin-top:1.1rem;flex-wrap:wrap;">
+        <button class="btn btn-gold" onclick="loginAccount()">Login and Continue</button>
+        <button class="btn btn-blue" onclick="nav('register')">Create New Account</button>
+      </div>
+      <button class="forgot-link" onclick="showForgotPanel()">Forgot password?</button>
+
+      <!-- ── Forgot / Reset panel ── -->
+      <div id="forgot-panel">
+        <h3>Reset Password</h3>
+        <div class="form-group">
+          <label class="form-label">Email or Username</label>
+          <input id="forgot-identifier" type="text" class="form-input" placeholder="you@example.com or username">
+        </div>
+        <div style="margin-top:.75rem;">
+          <button class="btn btn-ghost btn-sm" onclick="doForgotPassword()">Send Reset Token</button>
+        </div>
+        <div id="forgot-token-row">
+          <div class="form-group" style="margin-top:.75rem;">
+            <label class="form-label">Reset Token</label>
+            <input id="forgot-token" type="text" class="form-input" placeholder="Paste token from email">
+          </div>
+          <div class="form-group" style="margin-top:.6rem;">
+            <label class="form-label">New Password</label>
+            <input id="forgot-newpw" type="password" class="form-input" placeholder="New password (min 8 chars)">
+          </div>
+          <div style="margin-top:.75rem;">
+            <button class="btn btn-gold btn-sm" onclick="doResetPassword()">Reset Password</button>
+          </div>
+        </div>
+        <p id="forgot-status"></p>
+        <button class="forgot-link" onclick="hideForgotPanel()">← Back to login</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 3 · REGISTER
+══════════════════════════════════════════════ -->
+<div id="page-register" class="page">
+  <header class="auth-hdr">
+    <div class="auth-hdr__brand">
+      <button type="button" class="ckc-logo" aria-label="CKC">CKC</button>
+      <div class="auth-hdr__title">
+        <h2>Register</h2>
+        <p>Create your CKC account to get started.</p>
+      </div>
+    </div>
+    <div class="auth-hdr__actions hdr-actions">
+      <button class="btn btn-ghost btn-sm" onclick="nav('home')">Home</button>
+      <button class="btn btn-ghost btn-sm" onclick="nav('login')">← Login</button>
+    </div>
+  </header>
+  <div class="auth-body">
+    <div class="reg-panel">
+      <h2>Create Your CKC Account</h2>
+      <p class="sub">Standard users can request and manage tasks. Advanced users can also build custom agents.</p>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Name</label><input id="reg-name" class="form-input" placeholder="Your name" autocomplete="off"></div>
+        <div class="form-group"><label class="form-label">Username</label><input id="reg-username" class="form-input" placeholder="yourusername" autocomplete="off"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Email</label><input id="reg-email" type="email" class="form-input" placeholder="you@example.com" autocomplete="off"></div>
+        <div class="form-group"><label class="form-label">Password</label><input id="reg-password" type="password" class="form-input" placeholder="At least 8 characters" autocomplete="new-password"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">User Type</label>
+        <select id="reg-type" class="form-input form-select"><option>Standard (recommended)</option><option>Advanced</option></select>
+      </div>
+      <div style="margin-top:1.3rem;">
+        <button class="btn btn-gradient" onclick="registerAccount()">Create Account and Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 4 · WORKSPACE
+══════════════════════════════════════════════ -->
+<div id="page-workspace" class="page">
+  <div class="ws-topbar">
+    <div class="ws-topbar__left">
+      <button type="button" class="ckc-logo" aria-label="CKC">CKC</button>
+      <div class="auth-hdr__title"><h2>Workspace</h2><p>Track tasks and manage account settings.</p></div>
+    </div>
+    <div class="ws-topbar__actions hdr-actions">
+      <span id="ws-username" class="a2a-badge">@guest</span>
+      <button class="ws-tab" onclick="nav('home')">Home</button>
+      <button class="ws-tab active" id="tab-tasks" onclick="wsTab('tasks')">Tasks</button>
+      <button class="ws-tab" id="tab-settings" onclick="wsTab('settings')">Settings</button>
+      <button class="ws-tab" id="ws-store-btn" onclick="nav('store')">Agent Store</button>
+      <button class="ws-tab" id="ws-builder-btn" onclick="nav('builder')">Build Agent</button>
+      <button class="ws-tab" id="ws-home-btn" onclick="nav('home')">Homepage</button>
+      <button class="ws-tab" onclick="logoutAccount()">Logout</button>
+    </div>
+  </div>
+  <div class="ws-body">
+
+    <!-- TASKS -->
+    <div id="view-tasks" class="ws-view active">
+      <div class="tasks-hdr">
+        <h3>Active Tasks</h3>
+        <button class="btn btn-blue btn-sm" onclick="nav('home')">+ New Task</button>
+      </div>
+      <div id="frequent-agent-prompt" class="status-note" style="display:none;margin:.2rem 0 .6rem;"></div>
+      <div class="task-list" id="workspace-task-list"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="view-settings" class="ws-view">
+      <div class="settings-grid">
+        <!-- Account -->
+        <div class="s-panel">
+          <h2>Your Account</h2>
+          <div class="profile-row">
+            <div class="av av-blue" id="profile-avatar-display">👤</div>
+            <div class="profile-info" style="flex:1">
+              <h3 id="profile-display-name">—</h3>
+              <p id="profile-display-role">CKC Member</p>
+            </div>
+            <input id="profile-photo-input" type="file" accept="image/*" style="display:none;">
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('profile-photo-input').click()">Upload photo</button>
+          </div>
+          <div id="profile-missing-note" class="status-note" style="display:none;margin-top:.5rem;"></div>
+          <div class="s-sec">
+            <h4>Personal Information</h4><p>Update your personal details</p>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">First Name</label><input id="profile-first-name" class="form-input" placeholder="First name"></div>
+              <div class="form-group"><label class="form-label">Last Name</label><input id="profile-last-name" class="form-input" placeholder="Last name"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Email Address</label><input id="profile-email" class="form-input" placeholder="you@example.com"></div>
+              <div class="form-group"><label class="form-label">Phone (optional)</label><input id="profile-phone" class="form-input" placeholder="Optional"></div>
+            </div>
+            <button class="btn btn-blue btn-sm" onclick="saveWorkspaceProfile()">Save Profile</button>
+          </div>
+          <div class="s-sec">
+            <h4>Change Password</h4><p>Your new password must differ from previously used passwords</p>
+            <div class="form-group"><label class="form-label">Current Password</label><input id="ws-cur-pw" type="password" class="form-input" placeholder="Enter current password"></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">New Password</label><input id="ws-new-pw" type="password" class="form-input" placeholder="············"></div>
+              <div class="form-group"><label class="form-label">Confirm New Password</label><input id="ws-confirm-pw" type="password" class="form-input" placeholder="············"></div>
+            </div>
+            <p id="ws-pw-status" style="font-size:.78rem;margin-top:.5rem;min-height:1.1em;"></p>
+            <button class="btn btn-blue btn-sm" onclick="saveWorkspacePassword()">Change Password</button>
+          </div>
+          <div class="s-sec">
+            <h4>API Key</h4>
+            <p>Stored locally in this browser only — never sent to CKC servers.</p>
+            <div class="form-group">
+              <label class="form-label">Provider key (OpenAI / Anthropic / Gemini)</label>
+              <div style="display:flex;gap:.4rem;align-items:center;">
+                <input id="settings-api-key-input" type="password" class="form-input" placeholder="sk-… or sk-ant-…" autocomplete="off" style="flex:1;">
+                <button class="btn btn-ghost btn-sm" onclick="toggleApiKeyVisibility('settings-api-key-input',this)" style="flex-shrink:0;">Show</button>
+              </div>
+              <span id="settings-api-msg" style="font-size:.6rem;color:var(--muted);display:block;margin-top:.3rem;">No key saved.</span>
+            </div>
+            <button class="btn btn-blue btn-sm" onclick="saveSettingsApiKey()">Save & Use</button>
+          </div>
+          <div class="s-sec">
+            <h4>Active Sessions</h4>
+            <p>Manage where you are logged in.</p>
+            <p id="ws-session-status" style="font-size:.78rem;min-height:1.1em;"></p>
+            <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.5rem;">
+              <button class="btn btn-ghost btn-sm" onclick="revokeOtherSessions()">Revoke Other Sessions</button>
+              <button class="btn btn-red btn-sm" onclick="logoutAllSessions()">Log Out All Devices</button>
+            </div>
+          </div>
+          <div class="cost-strip">
+            <strong>Cost / Usage</strong>
+            <span><span id="profile-cost-usage">$0.00</span> used</span>
+            <span id="profile-cost-date">—</span>
+            <button class="btn btn-blue btn-sm" style="margin-left:auto;">Set Limit</button>
+            <button class="btn btn-ghost btn-sm" onclick="resetDemoData()">Reset Demo Data</button>
+          </div>
+        </div>
+        <!-- Agents panel -->
+        <div class="s-panel">
+          <h2>Your Agents</h2>
+          <div class="ag-sec">
+            <div class="ag-sec__hdr">
+              <p class="ag-sec__lbl">Created by Me</p>
+              <button class="btn btn-blue btn-sm" onclick="nav('builder')">+ Build Agent</button>
+            </div>
+            <div id="settings-created-agents"><p class="ag-empty">No agents created yet.</p></div>
+          </div>
+          <div class="ag-sec">
+            <div class="ag-sec__hdr">
+              <p class="ag-sec__lbl">Hired by Me</p>
+              <button class="btn btn-ghost btn-sm" onclick="nav('store')">Browse Store</button>
+            </div>
+            <div id="settings-hired-agents"><p class="ag-empty">No agents hired yet.</p></div>
+          </div>
+          <div class="ag-sec">
+            <div class="ag-sec__hdr">
+              <p class="ag-sec__lbl">Agent Teams</p>
+              <button class="btn btn-ghost btn-sm" onclick="createAgentTeam()">+ New Team</button>
+            </div>
+            <div id="settings-agent-teams"><p class="ag-empty">No teams created yet.</p></div>
+          </div>
+          <div id="manual-agents-list" style="display:none;"></div>
+          <div id="agent-upload-note" class="status-note" style="display:none;"></div>
+          <input id="agent-upload-input" type="file" accept=".md,.txt,.json" style="display:none;">
+        </div>
+      </div>
+    </div>
+  </div><!-- /ws-body -->
+</div><!-- /page-workspace -->
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 5 · TASK DETAIL
+══════════════════════════════════════════════ -->
+<div id="page-task" class="page">
+  <div class="ws-topbar">
+    <div class="ws-topbar__left">
+      <button type="button" class="ckc-logo" aria-label="CKC">CKC</button>
+      <div class="auth-hdr__title"><h2>Task Detail</h2><p>Monitor progress, hired agents, and outputs.</p></div>
+    </div>
+    <div class="ws-topbar__actions hdr-actions">
+      <button class="ws-tab" onclick="nav('home')">Home</button>
+      <button class="ws-tab active" id="td-tab-tasks" onclick="wsTab('tasks');nav('workspace','tasks')">Tasks</button>
+      <button class="ws-tab" id="td-tab-settings" onclick="wsTab('settings');nav('workspace','settings')">Settings</button>
+      <button class="ws-tab" id="td-store-btn" onclick="nav('store')">Agent Store</button>
+      <button class="ws-tab" id="td-builder-btn" onclick="nav('builder')">Build Agent</button>
+      <button class="ws-tab" id="td-home-btn" onclick="nav('home')">Homepage</button>
+    </div>
+  </div>
+
+  <div class="task-layout">
+    <!-- Sidebar -->
+    <aside class="task-sidebar">
+      <div class="task-sidebar__section">
+        <h4>What you spent</h4>
+        <div class="spend-box">
+          <div><strong>Cost Limit: </strong><span id="td-cost">0/25 USD</span></div>
+          <div><strong>Time Spent: </strong><span id="td-time">00:00:00</span></div>
+          <div class="est-row"><strong>Planned Calls:</strong><input id="td-est-calls" class="form-input est-input" type="number" min="1" max="200" value="12"></div>
+          <div><strong>Estimated Next Run: </strong><span id="td-est-cost">$0.000</span></div>
+          <div><strong>With Promos: </strong><span id="td-est-cost-promo">$0.000</span></div>
+          <div id="task-status" class="status-note" style="display:none;"></div>
+        </div>
+      </div>
+      <div class="task-sidebar__section">
+        <h4>Who you hired <button class="add-agent-btn" onclick="nav('store')">+Agent</button></h4>
+        <div id="td-hired">
+          <p style="font-size:.65rem;color:var(--muted)">Nobody</p>
+        </div>
+      </div>
+      <div class="task-sidebar__section">
+        <h4>What model you choose</h4>
+        <div class="model-row">
+          <select id="td-llm-provider" class="form-input form-select" style="font-size:.62rem;padding:.4em .6em;" onchange="_renderTaskModelOptions(this.value)">
+            <option value="groq" selected>Groq — Free</option>
+            <option value="cerebras">Cerebras — Free</option>
+            <option value="google">Gemini (Google)</option>
+            <option value="openai">ChatGPT (OpenAI)</option>
+            <option value="anthropic">Claude (Anthropic)</option>
+            <option value="openrouter">OpenRouter</option>
+            <option value="xai">Grok (xAI)</option>
+            <option value="mistral">Mistral</option>
+            <option value="deepseek">DeepSeek</option>
+            <option value="together">Together AI</option>
+            <option value="cohere">Cohere</option>
+          </select>
+          <select id="td-llm-model" class="form-input form-select" style="font-size:.62rem;padding:.4em .6em;">
+            <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option>
+            <option value="llama-3.1-8b-instant">llama-3.1-8b-instant</option>
+            <option value="mixtral-8x7b-32768">mixtral-8x7b-32768</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">API Key</label>
+          <div style="display:flex;gap:.4rem;align-items:center;"><input type="password" id="td-llm-api-key" class="form-input api-input" placeholder="Optional for free providers" autocomplete="new-password" data-1p-ignore="true" data-lpignore="true" style="flex:1;"><button class="btn btn-ghost btn-sm" onclick="toggleApiKeyVisibility('td-llm-api-key',this)">Show</button></div>
+          <div class="decision-row" style="margin-top:.45rem">
+            <button class="btn btn-blue btn-sm" onclick="saveTaskLlmSettings()">Save &amp; Use</button>
+            <button class="btn btn-ghost btn-sm" onclick="testTaskLlmSettings()">Test Key</button>
+          </div>
+          <p id="td-llm-status" style="font-size:.6rem;color:var(--muted);margin-top:.35rem">Groq (Free) is active. Add your own key to use other providers.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main feed -->
+    <div class="task-main">
+      <div class="task-main__header" id="td-title">Design a platform for CKC</div>
+      <div class="task-main__feed" id="td-feed">
+        <!-- dynamically populated -->
+      </div>
+      <div class="task-main__prompt">
+        <p>Prompt Box — Can always chat and add extra information for this task</p>
+        <textarea placeholder="Type here to add context or ask agents anything…"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 6 · AGENT STORE
+══════════════════════════════════════════════ -->
+<div id="page-store" class="page">
+  <header class="auth-hdr">
+    <div class="auth-hdr__brand">
+      <button type="button" class="ckc-logo" aria-label="CKC">CKC</button>
+      <div class="auth-hdr__title"><h2>Agent Store</h2><p>Discover and hire agents built by the community.</p></div>
+    </div>
+    <div class="auth-hdr__actions hdr-actions">
+      <button class="btn btn-ghost btn-sm" onclick="nav('home')">Home</button>
+      <button class="btn btn-blue btn-sm" onclick="nav('builder')">+ Build Agent</button>
+      <button class="btn btn-ghost btn-sm" onclick="nav('workspace','tasks')">← Workspace</button>
+    </div>
+  </header>
+  <div class="store-controls">
+    <input id="store-search" class="form-input" placeholder="Search agents or skills...">
+    <select id="store-filter" class="form-input form-select">
+      <option value="public">Public</option>
+      <option value="all">All</option>
+      <option value="mine">My agents</option>
+    </select>
+    <select id="store-sort" class="form-input form-select">
+      <option value="newest">Sort: Newest</option>
+      <option value="rating">Sort: Rating</option>
+      <option value="name">Sort: Name</option>
+    </select>
+    <div id="store-status" class="store-status-indicator" aria-label="Store status">
+      <span id="store-status-dot" class="store-status-dot"></span>
+      <div id="store-status-tooltip" class="store-status-tooltip"></div>
+    </div>
+  </div>
+  <p id="store-recruit-msg" style="font-size:.78rem;min-height:1.1em;margin:.3rem 0 0;display:none;"></p>
+  <div class="store-grid" id="store-grid"></div>
+  <div class="store-empty" id="store-empty" style="display:none;">No agents match this filter yet.</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 7 · AGENT BUILDER
+══════════════════════════════════════════════ -->
+<div id="page-builder" class="page">
+  <header class="auth-hdr">
+    <div class="auth-hdr__brand">
+      <button type="button" class="ckc-logo" aria-label="CKC">CKC</button>
+      <div class="auth-hdr__title"><h2>Agent Builder</h2><p>Define your agent's identity, skills, and permissions.</p></div>
+    </div>
+    <div class="auth-hdr__actions hdr-actions">
+      <button class="btn btn-ghost btn-sm" onclick="nav('home')">Home</button>
+      <button class="btn btn-ghost btn-sm" onclick="nav('store')">← Store</button>
+    </div>
+  </header>
+  <canvas id="builder-rain-cv" class="builder-rain"></canvas>
+  <div id="builder-lightning" class="builder-lightning"></div>
+
+  <div class="builder-layout">
+    <!-- Schema status bar -->
+    <aside class="builder-sidebar">
+      <h4>Schema Status Bar</h4>
+      <ul>
+        <li class="active" id="bl-0">Agent Name</li>
+        <li id="bl-1">Agent Class</li>
+        <li id="bl-2">Agent Type</li>
+        <li id="bl-3">Agent Description</li>
+        <li id="bl-4">Skills &amp; Tools</li>
+        <li id="bl-5">Knowledge Sources</li>
+        <li id="bl-6">Permissions</li>
+        <li id="bl-7">Safety Guardrails</li>
+        <li id="bl-8">API &amp; Runtime</li>
+        <li id="bl-9">Review &amp; Confirm</li>
+      </ul>
+    </aside>
+
+    <div class="builder-main">
+
+      <!-- Step 0: Name -->
+      <div class="builder-step active" id="bs-0">
+        <h2>Agent Name</h2>
+        <p style="font-size:.68rem;color:var(--muted);margin-bottom:1rem;">Agents built on CKC get an exclamation mark identifier — e.g. <span style="color:var(--blue)">!Primus!</span></p>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Start from Template</label><select id="builder-template-select" class="form-input form-select" onchange="applyBuilderTemplate(this.value)"><option value="">Custom (blank)</option></select></div>
+          <div class="form-group"><label class="form-label">Owner</label><input id="agent-owner-input" class="form-input" placeholder="e.g. Kelisi" value="Kelisi"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Agent Name</label><input class="form-input" placeholder="e.g. Primus" id="agent-name-input"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Release Status</label><select id="agent-status-select" class="form-input form-select"><option value="draft">Draft</option><option value="ready">Ready for review</option></select></div>
+          <div class="form-group"><label class="form-label">Risk Tier</label><select id="agent-risk-select" class="form-input form-select" onchange="updateBuilderCostPreview()"><option value="low">Low — Read-heavy assistant</option><option value="medium" selected>Medium — Guidance + limited actions</option><option value="high">High — External/system actions</option></select></div>
+        </div>
+        <div id="agent-risk-help" class="risk-help">Risk tier controls approval strictness and default pricing.</div>
+        <div id="agent-risk-reco" class="risk-help">Recommended setting: draft-only policy for first release.</div>
+        <p style="font-size:.62rem;color:var(--muted);margin-top:.5rem;">→ Your agent will be identified as <span id="agent-name-preview" style="color:var(--blue)">!AgentName!</span></p>
+        <div class="builder-nav">
+          <span></span>
+          <button class="btn btn-primary" onclick="builderNext(0)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Step 1: Class -->
+      <div class="builder-step" id="bs-1">
+        <h2>Agent Class</h2>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.5rem;">
+          <div class="flow-step-box" data-class="Creative and spatial" onclick="selectClass(this)" style="cursor:none;min-width:120px;text-align:center;">
+            <h5>Creative &amp; Spatial</h5><p>Design and planning workflows</p>
+          </div>
+          <div class="flow-step-box" data-class="Research, product, and build" onclick="selectClass(this)" style="cursor:none;min-width:120px;text-align:center;">
+            <h5>Research &amp; Build</h5><p>Product, code, and analysis</p>
+          </div>
+          <div class="flow-step-box" data-class="Go-to-market and service" onclick="selectClass(this)" style="cursor:none;min-width:120px;text-align:center;">
+            <h5>GTM &amp; Service</h5><p>Sales, support, growth</p>
+          </div>
+          <div class="flow-step-box" data-class="Enterprise ops and risk" onclick="selectClass(this)" style="cursor:none;min-width:120px;text-align:center;">
+            <h5>Ops &amp; Risk</h5><p>Compliance, finance, legal</p>
+          </div>
+        </div>
+        <div class="builder-nav">
+          <button class="btn btn-ghost" onclick="builderPrev(1)">← Back</button>
+          <button class="btn btn-primary" onclick="builderNext(1)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Type -->
+      <div class="builder-step" id="bs-2">
+        <h2>Agent Type</h2>
+        <div class="permission-grid">
+          <div class="perm-card" data-type="public" onclick="selectPerm(this,'public')" style="cursor:none;">
+            <h5><span style="color:var(--green)">ACTIVE</span> — Public Use</h5>
+            <p>Allow your agent to be hired by other users. The agent will be accessible in the Agent Store. The agent is no longer owned by a single user.</p>
+          </div>
+          <div class="perm-card" data-type="private" onclick="selectPerm(this,'private')" style="cursor:none;">
+            <h5><span style="color:var(--muted)">INACTIVE</span> — Restricted</h5>
+            <p>Agent access is restricted to the user that created it. A local file will be stored on the user's computer so the agent is available offline. The agent will be fully functional only when the user is online.</p>
+          </div>
+        </div>
+        <div class="builder-nav">
+          <button class="btn btn-ghost" onclick="builderPrev(2)">← Back</button>
+          <button class="btn btn-primary" onclick="builderNext(2)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Description -->
+      <div class="builder-step" id="bs-3">
+        <h2>Agent Description</h2>
+        <div class="form-group"><label class="form-label">Purpose / Goals of the agent</label><textarea id="agent-description-input" class="form-input" style="min-height:90px;resize:none;" placeholder="Describe what this agent does, its primary function, and goals..."></textarea></div>
+        <p id="template-desc-hint" style="font-size:.62rem;color:var(--muted);margin-top:.35rem;display:none;">Template description was prefilled. You can edit it before publishing.</p>
+        <div class="builder-nav">
+          <button class="btn btn-ghost" onclick="builderPrev(3)">← Back</button>
+          <button class="btn btn-primary" onclick="builderNext(3)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Skills -->
+      <div class="builder-step" id="bs-4">
+        <h2>Skills &amp; Tools</h2>
+        <p style="font-size:.65rem;color:var(--muted);margin-bottom:.3rem;">Select skills. Hover to see description. Click to select.</p>
+        <p style="font-size:.62rem;color:var(--muted);margin-bottom:.4rem;">Optional — you can skip this step and edit skills later.</p>
+        <div class="skills-grid">
+          <div class="skill-chip" onclick="this.classList.toggle('selected')">Connect to Notion</div>
+          <div class="skill-chip" onclick="this.classList.toggle('selected')">OpenAI Whisper</div>
+          <div class="skill-chip" onclick="this.classList.toggle('selected')">XURL</div>
+          <div class="skill-chip" onclick="this.classList.toggle('selected')">Spotify Player</div>
+          <div class="skill-chip" onclick="this.classList.toggle('selected')">Slack</div>
+          <div class="skill-chip" onclick="this.classList.toggle('selected')">GitHub</div>
+          <div class="skill-chip" onclick="this.classList.toggle('selected')">Discord</div>
+          <div class="skill-chip" onclick="this.classList.toggle('selected')">Coding</div>
+          <div class="skill-chip" onclick="this.classList.toggle('selected')">GOG</div>
+          <div class="skill-chip" onclick="this.classList.toggle('selected')">Obsidian</div>
+          <div class="skill-chip" onclick="this.classList.toggle('selected')">Summarize</div>
+          <div class="skill-chip" onclick="this.classList.toggle('selected')">Web Search</div>
+        </div>
+        <div class="form-group" style="margin-top:.8rem;"><label class="form-label">Tags (comma-separated)</label><input id="agent-tags-input" class="form-input" placeholder="e.g. research, compliance, automation"></div>
+        <div class="builder-nav">
+          <button class="btn btn-ghost" onclick="builderPrev(4)">← Back</button>
+          <button class="btn btn-primary" onclick="builderNext(4)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Step 5–8: placeholder -->
+      <div class="builder-step" id="bs-5">
+        <h2>Knowledge Sources</h2>
+        <p style="font-size:.62rem;color:var(--muted);margin-bottom:.4rem;">Optional — add references now or after your first draft run.</p>
+        <div class="form-group"><label class="form-label">Upload documents or paste URLs</label><textarea id="agent-knowledge-input" class="form-input" style="min-height:70px;resize:none;" placeholder="Paste URLs, upload files, or connect data sources..."></textarea></div>
+        <div style="display:flex;align-items:center;gap:.45rem;margin-top:-.15rem;margin-bottom:.5rem;"><input id="agent-knowledge-files" type="file" multiple style="display:none;"><button class="btn btn-ghost btn-sm" onclick="document.getElementById('agent-knowledge-files').click()">Upload Documents</button><span id="agent-upload-summary" style="font-size:.62rem;color:var(--muted);">No files selected.</span></div>
+        <div class="form-group"><label class="form-label">Handoff Targets (comma-separated)</label><input id="agent-handoff-input" class="form-input" placeholder="e.g. Product Strategist, Data Analyst"></div>
+        <p style="font-size:.62rem;color:var(--muted);margin-top:.35rem;">Handoff targets are fallback collaborators this agent can route work to when confidence is low, policy blocks execution, or special expertise is required.</p>
+        <div class="builder-nav"><button class="btn btn-ghost" onclick="builderPrev(5)">← Back</button><button class="btn btn-primary" onclick="builderNext(5)">Next →</button></div>
+      </div>
+      <div class="builder-step" id="bs-6">
+        <h2>Permissions &amp; Approval Policy</h2>
+        <p style="font-size:.65rem;color:var(--muted);margin-bottom:.75rem;">Configure distribution and approval behavior before execution.</p>
+        <div class="form-group"><label class="form-label">Collaborate Mode</label><select id="agent-permission-select" class="form-input form-select"><option value="public">Active — visible to all CKC users</option><option value="private">Inactive — creator only</option></select></div>
+        <div class="form-group"><label class="form-label">Approval Policy</label><select id="agent-approval-select" class="form-input form-select"><option value="draft_only">Draft only</option><option value="approval_required">Execute with approval</option><option value="blocked">Blocked external actions</option></select></div>
+        <div class="builder-nav"><button class="btn btn-ghost" onclick="builderPrev(6)">← Back</button><button class="btn btn-primary" onclick="builderNext(6)">Next →</button></div>
+      </div>
+      <div class="builder-step" id="bs-7">
+        <h2>Safety Guardrails &amp; Tool Rights</h2>
+        <p style="font-size:.65rem;color:var(--muted);margin-bottom:.75rem;">Define what your agent is and is not allowed to do. CKC policy checks every requested action for violations before private activation or store launch.</p>
+        <div class="risk-help" style="margin-bottom:.65rem;"><strong>Recommended defaults are active.</strong> You can modify these settings, but CKC policy evaluation still runs before private activation or store publishing.</div>
+        <div class="form-group"><label class="form-label">Allowed actions</label><input id="agent-allowed-input" class="form-input" value="read files, summarize, search web" placeholder="e.g. read files, send emails, search web"></div>
+        <div class="form-group"><label class="form-label">Prohibited actions</label><input id="agent-prohibited-input" class="form-input" value="delete files, financial transactions, identity impersonation" placeholder="e.g. delete files, make purchases"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Tool Read Scope</label><input id="agent-tool-read-input" class="form-input" value="docs, policies, dashboards" placeholder="docs, policies, dashboards"></div>
+          <div class="form-group"><label class="form-label">Tool Write Scope</label><input id="agent-tool-write-input" class="form-input" value="draft notes, summaries" placeholder="draft notes, summaries"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Restricted Tools</label><input id="agent-tool-restricted-input" class="form-input" value="external publishing, account updates" placeholder="external publishing, account updates"></div>
+        <div class="form-group"><label class="form-label">Fallback Behavior</label><select id="agent-fallback-select" class="form-input form-select"><option value="ask_clarifying_question">Ask clarifying question</option><option value="defer_to_human">Defer to human</option><option value="safe_stop">Stop safely</option></select></div>
+        <div class="builder-nav"><button class="btn btn-ghost" onclick="builderPrev(7)">← Back</button><button class="btn btn-primary" onclick="builderNext(7)">Next →</button></div>
+      </div>
+      <div class="builder-step" id="bs-8">
+        <h2>API &amp; Runtime</h2>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Provider</label><select id="agent-provider-select" class="form-input form-select" onchange="updateProviderHelp();updateBuilderModelOptions()"><option value="groq" selected>Groq — Free</option><option value="cerebras">Cerebras — Free</option><option value="google">Gemini (Google)</option><option value="openai">ChatGPT (OpenAI)</option><option value="anthropic">Claude (Anthropic)</option><option value="openrouter">OpenRouter</option><option value="xai">Grok (xAI)</option><option value="mistral">Mistral</option><option value="deepseek">DeepSeek</option><option value="together">Together AI</option><option value="cohere">Cohere</option></select></div>
+          <div class="form-group"><label class="form-label">Model</label><select id="agent-model-select" class="form-input form-select"><option>llama-3.3-70b-versatile</option><option>llama-3.1-8b-instant</option><option>mixtral-8x7b-32768</option></select></div>
+        </div>
+        <div class="form-group"><label class="form-label">API Key</label><div style="display:flex;gap:.4rem;"><input id="agent-api-key-input" type="password" class="form-input" placeholder="Paste key…" autocomplete="off" style="flex:1;"><button class="btn btn-ghost btn-sm" onclick="toggleApiKeyVisibility('agent-api-key-input',this)">Show</button></div></div>
+        <div id="provider-help" class="risk-help">OpenAI: get your API key from platform.openai.com → API keys.</div>
+        <div class="form-group" style="margin-top:.7rem;"><label class="form-label">Connect / Control your agent with OpenClaw</label><div style="display:flex;gap:.45rem;"><input id="openclaw-endpoint" class="form-input" placeholder="OpenClaw endpoint (optional)"><button class="btn btn-ghost btn-sm" onclick="connectOpenClaw()">Connect OpenClaw</button></div><p id="openclaw-status" style="font-size:.62rem;color:var(--muted);margin-top:.35rem;">Not connected.</p></div>
+        <p style="font-size:.62rem;color:var(--muted);margin-top:.4rem;">Estimated Store Price: <span id="agent-cost-preview" style="color:var(--green)">$0.009</span> per call</p>
+        <div class="builder-nav"><button class="btn btn-ghost" onclick="builderPrev(8)">← Back</button><button class="btn btn-primary" onclick="builderNext(8)">Review →</button></div>
+      </div>
+
+      <!-- Step 9: Review -->
+      <div class="builder-step" id="bs-9">
+        <h2>Review &amp; Confirm</h2>
+        <div id="builder-msg" style="display:none;"></div>
+        <div id="builder-review-summary" class="status-note" style="display:block;margin-bottom:.8rem;"></div>
+        <div class="flow-steps">
+          <div class="flow-step-box"><h5>Agents Identifier</h5><p>Built agents: <span style="color:var(--blue)">!Name!</span><br>Visiting agents: <span style="color:var(--green)">!!Name!!</span></p></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step-box"><h5>Safety Guardrails</h5><p>Permissions reviewed</p></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step-box"><h5>API Runtime</h5><p>Key verified</p></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step-box"><h5>Agent Protocols</h5><p>Skill.md · Soul.md · Heartbeat.md verified</p></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step-box"><h5>Review &amp; Confirm</h5><p>Ready to publish</p></div>
+        </div>
+        <div class="builder-nav">
+          <button class="btn btn-ghost" onclick="builderPrev(9)">← Back</button>
+          <button class="btn btn-gradient" onclick="publishAgent()">Publish Agent ✓</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════ -->
+<script src="/assets/js/core.js?v=20260415" defer></script>
+<script src="/assets/js/auth.js?v=20260415" defer></script>
+<script src="/assets/js/task.js?v=20260416" defer></script>
+<script src="/assets/js/ui.js?v=20260415" defer></script>
+<script>
+// Agent name live preview
+document.addEventListener('input', e=>{
+  if(e.target.id==='agent-name-input'){
+    const v = e.target.value.trim()||'AgentName';
+    document.getElementById('agent-name-preview').textContent='!'+v+'!';
+    updateBuilderReview();
+  }
+  if(['agent-owner-input','agent-description-input','agent-tags-input','agent-handoff-input','agent-risk-select','agent-status-select','agent-approval-select','agent-permission-select'].includes(e.target.id)) updateBuilderCostPreview();
+});
+
+document.addEventListener('click', e=>{
+  if(e.target.classList && e.target.classList.contains('skill-chip')) updateBuilderCostPreview();
+});
+
+document.addEventListener('DOMContentLoaded', ()=>{ initAgentPlatform(); });
+
+/* ── Rain canvas ── */
+(function(){
+  const cv=document.getElementById('rain-cv');
+  const ctx=cv.getContext('2d');
+  let drops=[];
+  function resize(){cv.width=window.innerWidth;cv.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<50;i++){drops.push({x:Math.random()*3000,y:Math.random()*900,len:Math.random()*55+15,speed:Math.random()*2.5+1.2,op:Math.random()*.18+.04,w:Math.random()*.7+.3});}
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    drops.forEach(d=>{
+      const g=ctx.createLinearGradient(d.x,d.y,d.x-4,d.y+d.len);
+      g.addColorStop(0,'rgba(130,195,255,0)');g.addColorStop(.4,'rgba(130,195,255,'+d.op+')');g.addColorStop(1,'rgba(130,195,255,0)');
+      ctx.beginPath();ctx.strokeStyle=g;ctx.lineWidth=d.w;
+      ctx.moveTo(d.x,d.y);ctx.lineTo(d.x-4,d.y+d.len);ctx.stroke();
+      d.y+=d.speed;d.x-=d.speed*.18;
+      if(d.y-d.len>cv.height||d.x<-20){d.x=Math.random()*(cv.width+80);d.y=-d.len;}
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+(function(){
+  const cv=document.getElementById('builder-rain-cv');
+  if(!cv) return;
+  const lightning=document.getElementById('builder-lightning');
+  const ctx=cv.getContext('2d');
+  let drops=[];
+  function resize(){cv.width=window.innerWidth;cv.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<40;i++){drops.push({x:Math.random()*2600,y:Math.random()*900,len:Math.random()*48+14,speed:Math.random()*2.2+1.1,op:Math.random()*.16+.04,w:Math.random()*.65+.3});}
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    drops.forEach(d=>{
+      const g=ctx.createLinearGradient(d.x,d.y,d.x-3,d.y+d.len);
+      g.addColorStop(0,'rgba(130,195,255,0)');g.addColorStop(.4,'rgba(130,195,255,'+d.op+')');g.addColorStop(1,'rgba(130,195,255,0)');
+      ctx.beginPath();ctx.strokeStyle=g;ctx.lineWidth=d.w;
+      ctx.moveTo(d.x,d.y);ctx.lineTo(d.x-3,d.y+d.len);ctx.stroke();
+      d.y+=d.speed;d.x-=d.speed*.16;
+      if(d.y-d.len>cv.height||d.x<-20){d.x=Math.random()*(cv.width+80);d.y=-d.len;}
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  function lightningFlash(){
+    if(!lightning) return;
+    lightning.style.opacity = String((Math.random()*0.22 + 0.08).toFixed(2));
+    setTimeout(()=>{ lightning.style.opacity = '0'; }, 220 + Math.random()*180);
+    setTimeout(lightningFlash, 9000 + Math.random()*14000);
+  }
+  setTimeout(lightningFlash, 5000 + Math.random()*6000);
+})();
+</script>
+</body>
+</html>
